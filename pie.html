@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script type="text/javascript" src="http://d3js.org/d3.v5.min.js"></script>
+  <title>饼状图</title>
+</head>
+<body>
+    <svg width="960" height="600"></svg>
+    <script>
+      // 1. 数据准备
+      var marge = {top: 60, bottom: 60, left: 60, right: 60}
+      var svg = d3.select("svg");
+      var width = svg.attr("width");
+      var height = svg.attr("height");
+      var g = svg.append("g").attr("transform", "translate("+ marge.top +","+ marge.left +")");
+      var dataset = [ 30, 10, 43, 55, 13 ];
+
+      // 2. 设置颜色比例尺
+      var colorScale = d3.scaleOrdinal()
+        .domain(d3.range(dataset.length))
+        .range(d3.schemeCategory10);
+
+      // 3. 新建饼状图
+      var pie = d3.pie();
+
+      // 4. 新建弧形生成器
+      var innerRadius = 0;
+      var outerRadius = 100;
+      var arc_generator = d3.arc()
+        .innerRadius(0)
+        .outerRadius(100);
+
+      // 5. 利用饼状图生成器转换数据
+      var pieData = pie(dataset);
+
+      // 6. 扇形建立分组
+      var gs = g.selectAll(".g")
+        .data(pieData)
+        .enter()
+        .append("g")
+        .attr("transform","translate("+ width/2 +","+ height/2 +")")
+
+      // 7. 绘制扇形
+      gs.append("path")
+        .attr("d", function(d){ return arc_generator(d) })
+        .attr("fill", function(d, i){ return colorScale(i) })
+
+      // 8. 文字
+      gs.append("text")
+        .attr("transform", function(d){ return "translate("+ arc_generator.centroid(d) +")" })
+        .attr("text-anchor", "middle")
+        .text(function(d){ return d.data })
+    </script>
+</body>
+</html>
